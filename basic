@@ -1,23 +1,22 @@
-#!/bin/bash
+#!/bin/bash -i
 
 #Setup binaries
 FREEMEMORY='/bin/free'
 QUOTA='/bin/quota'
 DISKFREE='/bin/df'
 GROUPNAME='/bin/groups'
-HISTORY='/bin/history'
 
 #Seletion
-option=$1
+OPTION=$1
 
 #Check if there is an option entered
-if [ -z "$option" ]
+if [ -z "$OPTION" ]
 then
 exit
 fi
 
 #Check option value
-case "$option" in
+case "$OPTION" in
 quota)
     $QUOTA -s
 ;;
@@ -28,8 +27,8 @@ diskfree)
     $DISKFREE -h 2>/dev/null | less
 ;;
 groups)
-    $GROUPNAME $LOGNAME
+    $GROUPNAME "$LOGNAME"
 ;;
 history)
-    $HISTORY | less
+    history | less
 esac
