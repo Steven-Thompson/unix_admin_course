@@ -1,0 +1,15 @@
+#!/bin/bash
+
+option=$1
+
+#Check if there is an option entered
+if [ -z $option ]
+then
+exit
+fi
+
+if [ $option = "quota" ] 
+then
+	echo "Display quota information"
+fi
+
