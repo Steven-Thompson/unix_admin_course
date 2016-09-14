@@ -1,15 +1,17 @@
 #!/bin/bash
 
+QUOTA='/bin/quota -s'
+
 option=$1
 
 #Check if there is an option entered
-if [ -z $option ]
+if [ -z "$option" ]
 then
 exit
 fi
 
-if [ $option = "quota" ] 
+if [ "$option" = "quota" ] 
 then
-	quota -s
+	$QUOTA
 fi
 
