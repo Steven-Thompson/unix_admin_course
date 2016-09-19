@@ -12,7 +12,7 @@ OPTION=$1
 #Check if there is an option entered
 if [ -z "$OPTION" ]
 then
-exit
+    exit -1
 fi
 
 #Check option value
@@ -32,3 +32,4 @@ groups)
 history)
     history | less
 esac
+exit 0

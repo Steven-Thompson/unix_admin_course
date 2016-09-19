@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+while getopts ":pob:" opt; do
+    case $opt in
+        p)
+            PROCESSORS=`grep processor /proc/cpuinfo | wc -l`
+            echo "There are $PROCESSORS cpu's available on this system"
+        ;;
+        o)
+            echo "There is a limit of `ulimit -u` processes available to a single user"    
+        ;;
+        b)
+            #add check for a whilecard symbol
+            WILDCARD=$2
+            DESTINATION=$3
+
+         #   if [[ "$WILDCARD" == *"*"* ]] || [[ "$WILDCARD" == *"?"* ]]; then
+         #       echo "test" > /dev/null
+         #   else
+         #       echo $WILDCARD
+         #       echo "There must be a wildcard operator. Example: ? *"
+         #       exit -1
+         #   fi
+
+  #          if [[ -z $(find $WILDCARD)  ]]; then
+ #               exit
+#            fi
+
+
+            if [[ -z "$DESTINATION" ]]; then
+                echo "You must enter in a folder destination for files to be stored"
+                exit -2
+            fi
+
+            
+#            echo "$DESTINATION"
+            
+            #If the file cannot be found (not check for a directory since files cannot have the same name)
+            if [[ -z $(find -name $DESTINATION)  ]]; then
+               mkdir $DESTINATION
+               find $WILDCARD | xargs cp -t $DESTINATION
+            elif [[ -d "$DESTINATION"  ]]; then
+                find $WILDCARD | xargs cp -t $DESTINATION
+                else
+                    echo "A file with that name already exists and cannot be written to"
+                    exit -3
+            fi
+        ;;
+        \?)
+        echo "Unknown option: -$OPTARG"
+        ;;
+        :)
+            echo "Option -$OPTARG requires an argument."
+        ;;
+    esac
+done
