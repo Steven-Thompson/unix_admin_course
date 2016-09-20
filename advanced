@@ -1,9 +1,13 @@
 #!/bin/bash
 
+#Setup binaries
+FIND=/usr/bin/find
+
 
 while getopts ":pob:" opt; do
     case $opt in
         p)
+            #Find processor from cpuinfo and count how many there are
             PROCESSORS=`grep processor /proc/cpuinfo | wc -l`
             echo "There are $PROCESSORS cpu's available on this system"
         ;;
@@ -11,38 +15,43 @@ while getopts ":pob:" opt; do
             echo "There is a limit of `ulimit -u` processes available to a single user"    
         ;;
         b)
-            #add check for a whilecard symbol
+            #Setup variables
             WILDCARD=$2
             DESTINATION=$3
 
-         #   if [[ "$WILDCARD" == *"*"* ]] || [[ "$WILDCARD" == *"?"* ]]; then
-         #       echo "test" > /dev/null
-         #   else
-         #       echo $WILDCARD
-         #       echo "There must be a wildcard operator. Example: ? *"
-         #       exit -1
-         #   fi
+            #Setup searches
+            FINDFILES="`$FIND $WILDCARD 2>/dev/null`"
+            COPIEDFILES=`wc -w <<< $FINDFILES`
 
-  #          if [[ -z $(find $WILDCARD)  ]]; then
- #               exit
-#            fi
-
-
+            #Check if there are results for the entered wildcard
+            if [[ -z "$FINDFILES"  ]]; then
+                echo "There are no results that match: $WILDCARD"
+                exit
+            fi
+            
+            #Check that the desination has been passed through to the command
             if [[ -z "$DESTINATION" ]]; then
                 echo "You must enter in a folder destination for files to be stored"
                 exit -2
             fi
-
             
-#            echo "$DESTINATION"
+            #Check for the right amount of arguments
+            if [[ "$#" -gt 3  ]]; then
+                echo "There are too many arguments passed through"
+                exit
+            fi
             
-            #If the file cannot be found (not check for a directory since files cannot have the same name)
-            if [[ -z $(find -name $DESTINATION)  ]]; then
+            #If the file cannot be found then it's safe to create a directory
+            if [[ -z $("$FIND" -name "$DESTINATION")  ]]; then
                mkdir $DESTINATION
-               find $WILDCARD | xargs cp -t $DESTINATION
+               $FIND $WILDCARD | xargs cp -t "$DESTINATION"
+               echo "The '${DESTINATION}' directory has been created with $COPIEDFILES files copied"
+            #If a file is found and it's a directory and not a file then execute the copy
             elif [[ -d "$DESTINATION"  ]]; then
-                find $WILDCARD | xargs cp -t $DESTINATION
+                $FIND $WILDCARD | xargs cp -t "$DESTINATION"
+                echo "The '${DESTINATION}' directory already exists. $COPIEDFILES files have been copied"
                 else
+                    #A file exists but is not a directory. The files cannot be copied into this
                     echo "A file with that name already exists and cannot be written to"
                     exit -3
             fi
@@ -55,3 +64,4 @@ while getopts ":pob:" opt; do
         ;;
     esac
 done
+exit 0
