@@ -10,26 +10,26 @@ GROUPNAME='/bin/groups'
 OPTION=$1
 
 #Check if there is an option entered
-if [ -z "$OPTION" ]
-then
+if [[ -z "$OPTION" ]]; then
     exit -1
 fi
 
 #Check option value
 case "$OPTION" in
-quota)
-    $QUOTA -s
-;;
-freemem)
-    $FREEMEMORY -mh
-;;
-diskfree)
-    $DISKFREE -h 2>/dev/null | less
-;;
-groups)
-    $GROUPNAME "$LOGNAME"
-;;
-history)
-    history | less
+    quota)
+        $QUOTA -s
+    ;;
+    freemem)
+        $FREEMEMORY -mh
+    ;;
+    diskfree)
+        $DISKFREE -h 2>/dev/null | less
+    ;;
+    groups)
+        $GROUPNAME "$LOGNAME"
+    ;;
+    history)
+        history | less
+    ;;
 esac
 exit 0
