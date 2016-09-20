@@ -44,11 +44,11 @@ while getopts ":pob:" opt; do
             #If the file cannot be found then it's safe to create a directory
             if [[ -z $("$FIND" -name "$DESTINATION")  ]]; then
                mkdir $DESTINATION
-               $FIND $WILDCARD | xargs cp -t "$DESTINATION"
+               $FIND $WILDCARD -type f | xargs cp -t "$DESTINATION"
                echo "The '${DESTINATION}' directory has been created with $COPIEDFILES files copied"
             #If a file is found and it's a directory and not a file then execute the copy
             elif [[ -d "$DESTINATION"  ]]; then
-                $FIND $WILDCARD | xargs cp -t "$DESTINATION"
+                $FIND $WILDCARD -type f | xargs cp -t "$DESTINATION"
                 echo "The '${DESTINATION}' directory already exists. $COPIEDFILES files have been copied"
                 else
                     #A file exists but is not a directory. The files cannot be copied into this
