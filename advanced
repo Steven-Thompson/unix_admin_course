@@ -4,23 +4,33 @@
 FIND=/usr/bin/find
 
 while getopts ":pob:" opt; do
+    #echo $((OPTIND))
+
+    
+
     case $opt in
         p)
             #Find processor from cpuinfo and count how many there are
             PROCESSORS=$(grep processor /proc/cpuinfo -c)
             echo "There are $PROCESSORS cpu's available on this system"
+            echo $OPTIND
         ;;
         o)
             echo "There is a limit of $(ulimit -u) processes available to a single user"    
         ;;
         b)
+
+            echo $OPTIND
+
             #Setup variables
             WILDCARD="$2"
-            DESTINATION=$3
+            DESTINATION="$3"
             
             #Setup searches
-            FINDFILES=$("$FIND" -maxdepth 1 -name "$WILDCARD" 2>/dev/null)
+            FINDFILES=$("$FIND" -name "$WILDCARD" 2>/dev/null)
             COPIEDFILES=$(wc -w <<< "$FINDFILES")
+
+            
 
             #Check if there are results for the entered wildcard
             if [[ -z "$FINDFILES" ]]; then
@@ -43,11 +53,11 @@ while getopts ":pob:" opt; do
             #If the file cannot be found then it's safe to create a directory
             if [[ -z $("$FIND" -name "$DESTINATION") ]]; then
                mkdir "$DESTINATION"
-               $FIND -maxdepth 1 -name "$WILDCARD" -type f | xargs cp -t "$DESTINATION"
+               $FIND -name "$WILDCARD" -type f -exec cp -t "$DESTINATION" {} \;
                echo "The '${DESTINATION}' directory has been created with $COPIEDFILES files copied"
             #If a file is found and it's a directory and not a file then execute the copy
             elif [[ -d "$DESTINATION" ]]; then
-                $FIND -maxdepth 1 -name "$WILDCARD" -type f | xargs cp -t "$DESTINATION"
+                $FIND -name "$WILDCARD" -type f -exec cp -t "$DESTINATION" {} \;
                 echo "The '${DESTINATION}' directory already exists. $COPIEDFILES files have been copied"
                 else
                     #A file exists but is not a directory. The files cannot be copied into this
