@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Function passwd
+# Useage Example: passwd groupid ftp
+
+function passwd {
+    
+    # Setup function variables
+    SEARCH=$1
+    USER=$2
+    
+    # Delimiter used in the passwd file
+    IFS=":"
+
+    # Separates the found line with the delimiter provided.
+    while IFS=: read username password userid groupid comment home shell
+    do
+        eval "echo \$$SEARCH"
+    done <<< "$(grep "^${USER}:" /etc/passwd)"
+}
+
+# Call the function
+passwd "$1" "$2"

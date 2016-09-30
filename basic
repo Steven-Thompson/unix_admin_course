@@ -1,10 +1,10 @@
 #!/bin/bash -i
 
 #Setup binaries
-FREEMEMORY='/bin/free'
-QUOTA='/bin/quota'
-DISKFREE='/bin/df'
-GROUPNAME='/bin/groups'
+FREEMEMORY="/bin/free"
+QUOTA="/bin/quota"
+DISKFREE="/bin/df"
+GROUPNAME="/bin/groups"
 
 #Seletion
 OPTION=$1
@@ -23,7 +23,7 @@ case "$OPTION" in
         $FREEMEMORY -mh
     ;;
     diskfree)
-        $DISKFREE -h 2>/dev/null | less
+        $DISKFREE -h 2>/dev/null | more
     ;;
     groups)
         $GROUPNAME "$LOGNAME"

@@ -3,67 +3,70 @@
 #Setup binaries
 FIND=/usr/bin/find
 
+COUNT=1
+
 while getopts ":pob:" opt; do
     #echo $((OPTIND))
-
-    
 
     case $opt in
         p)
             #Find processor from cpuinfo and count how many there are
             PROCESSORS=$(grep processor /proc/cpuinfo -c)
             echo "There are $PROCESSORS cpu's available on this system"
-            echo $OPTIND
+            #echo $OPTIND
         ;;
         o)
             echo "There is a limit of $(ulimit -u) processes available to a single user"    
+            #echo "$?"
         ;;
         b)
-
-            echo $OPTIND
+            ARGPOS=$COUNT
 
             #Setup variables
-            WILDCARD="$2"
-            DESTINATION="$3"
+            let ARGPOS++
+            eval "WILDCARD=\$$((ARGPOS))"
+            let ARGPOS++
+            eval "DIRECTORY=\$$((ARGPOS))"
             
             #Setup searches
-            FINDFILES=$("$FIND" -name "$WILDCARD" 2>/dev/null)
+            FINDFILES=$("$FIND" -name "$WILDCARD" -type f 2>/dev/null)
             COPIEDFILES=$(wc -w <<< "$FINDFILES")
+            
+            # Check the wildcard to see if there are results
+            if [[ -z $($FIND -name "$WILDCARD" -type f) ]]; then
+                echo "There are no matches for: $WILDCARD"
+                exit
+            fi
+
+            # Check if there are any arguments missing before progressing
+            if [[ -z $DIRECTORY  ]] || [[ -z $WILDCARD ]];  then
+                echo "There are missing arguments for switch -b"
+                exit
+            fi
 
             
+            # Check if there are results for the directory and make sure its a directory.
+            if [[ -n $("$FIND" -name "$DIRECTORY" 2>/dev/null) ]] && [[ -d "$DIRECTORY" ]]; then
+                #echo "Directory exists you are free to copy the files"
+                "$FIND" -name "$WILDCARD" -type f -exec cp -t "$DIRECTORY" {} \; 2>/dev/null
+            # If nothing exists (file or directory) create a directory
+            elif [[ ! -a $DIRECTORY  ]]; then
+                mkdir $DIRECTORY 2>/dev/null
+                "$FIND" -name "$WILDCARD" -type f -exec cp -t "$DIRECTORY" {} \; 2>/dev/null
+                echo "$DIRECTORY has been created. $COPIEDFILES have been copied."
 
-            #Check if there are results for the entered wildcard
-            if [[ -z "$FINDFILES" ]]; then
-                echo "There are no results that match: $WILDCARD"
-                exit -1
+                # Check if there is an error making the directory
+                if [[ $? -ne 0 ]]; then
+                    echo "You must supply a valid argument with the -b switch. Example: -b <wildcard> <directoryname>"
+                    exit
+                fi
+            else
+                # There is a file with the same name.
+                echo "There is a file with the same name."
             fi
-            
-            #Check that the desination has been passed through to the command
-            if [[ -z "$DESTINATION" ]]; then
-                echo "You must enter in a folder destination for files to be stored"
-                exit -2
-            fi
-            
-            #Check for the right amount of arguments
-            if [[ "$#" -gt 3 ]]; then
-                echo "There are too many arguments passed through"
-                exit -3
-            fi
-            
-            #If the file cannot be found then it's safe to create a directory
-            if [[ -z $("$FIND" -name "$DESTINATION") ]]; then
-               mkdir "$DESTINATION"
-               $FIND -name "$WILDCARD" -type f -exec cp -t "$DESTINATION" {} \;
-               echo "The '${DESTINATION}' directory has been created with $COPIEDFILES files copied"
-            #If a file is found and it's a directory and not a file then execute the copy
-            elif [[ -d "$DESTINATION" ]]; then
-                $FIND -name "$WILDCARD" -type f -exec cp -t "$DESTINATION" {} \;
-                echo "The '${DESTINATION}' directory already exists. $COPIEDFILES files have been copied"
-                else
-                    #A file exists but is not a directory. The files cannot be copied into this
-                    echo "A file with that name already exists and cannot be written to"
-                    exit -4
-            fi
+
+            # Shift requires because of second argument
+            shift
         ;;
         #If there is an unknown operator then throw an error
         \?)
@@ -74,5 +77,7 @@ while getopts ":pob:" opt; do
             echo "Option -$OPTARG requires an argument."
         ;;
     esac
+
+    let COUNT++
 done
 exit 0
