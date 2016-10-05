@@ -25,7 +25,7 @@ function main_menu {
     $PRINTF "# 4) quit\n"
     $PRINTF "#\n"
     $PRINTF "# Please enter a choice: "
-    read CHOICE
+    read -r CHOICE
     $PRINTF "######################################################################################\n\n"
 }
 
@@ -41,7 +41,7 @@ function basic_menu {
     $PRINTF "# 5) Show the history of the commands for bash\n"
     $PRINTF "# 6) Quit this menu\n#\n"
     $PRINTF "# Please enter an option: "
-    read CHOICE
+    read -r CHOICE
     $PRINTF "######################################################################################\n\n"
 }
 
@@ -54,7 +54,7 @@ function advanced_menu {
     $PRINTF "# 3) Backup all files that match a criterion\n"
     $PRINTF "# 4) Quit this menu\n#\n"
     $PRINTF "# Please enter your choice: "
-    read CHOICE
+    read -r CHOICE
     $PRINTF "######################################################################################\n\n"
 }
 
@@ -69,7 +69,7 @@ function passwd_menu {
     $PRINTF "# 5) Print the default shell of a specified user\n"
     $PRINTF "# 6) Exit this menu\n#\n"
     $PRINTF "# Please enter your selection: "
-    read CHOICE
+    read -r CHOICE
     $PRINTF "######################################################################################\n\n"
 }
 
@@ -113,9 +113,9 @@ while [[ $QUIT -eq "0" ]]; do
 
                 if [[ $CHOICE -eq "3" ]]; then
                     $PRINTF "Please enter the criteria to search: "
-                    read CRITERIA
+                    read -r CRITERIA
                     $PRINTF "Enter the directory to store the backup: "
-                    read BACKUP
+                    read -r BACKUP
                 fi
 
                 case $CHOICE in
@@ -140,24 +140,24 @@ while [[ $QUIT -eq "0" ]]; do
                 
                 if [[ $CHOICE -gt "0" ]] && [[ $CHOICE -lt "6" ]]; then
                     $PRINTF "Enter the specified user: "
-                    read USER
+                    read -r USER
                 fi
 
                 case $CHOICE in
                 1)
-                    ./userman userid $USER
+                    ./userman userid "$USER"
                 ;;
                 2)
-                    ./userman groupid $USER
+                    ./userman groupid "$USER"
                 ;;
                 3)
-                    ./userman comment $USER
+                    ./userman comment "$USER"
                 ;;
                 4)
-                    ./userman home $USER
+                    ./userman home "$USER"
                 ;;
                 5)
-                    ./userman shell $USER
+                    ./userman shell "$USER"
                 ;;
                 6)
                     SUBMENU=1
