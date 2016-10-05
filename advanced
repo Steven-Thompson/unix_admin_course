@@ -2,82 +2,84 @@
 
 #Setup binaries
 FIND=/usr/bin/find
+WC=/usr/bin/wc
+GREP=/usr/bin/grep
+CP=/usr/bin/cp
+MKDIR=/usr/bin/mkdir
 
+# Keeps track of the itteration
 COUNT=1
 
 while getopts ":pob:" opt; do
-    #echo $((OPTIND))
-
     case $opt in
         p)
-            #Find processor from cpuinfo and count how many there are
-            PROCESSORS=$(grep processor /proc/cpuinfo -c)
-            echo "There are $PROCESSORS cpu's available on this system"
-            #echo $OPTIND
+            # Find processor from cpuinfo and count how many there are
+            PROCESSORS=$("$GREP" processor /proc/cpuinfo -c)
+            echo "$PROCESSORS"
         ;;
         o)
-            echo "There is a limit of $(ulimit -u) processes available to a single user"    
-            #echo "$?"
+            # Maximum number of open files allowed per user
+            echo "$(ulimit -u)"    
         ;;
         b)
             ARGPOS=$COUNT
 
-            #Setup variables
+            # Setup variables
             let ARGPOS++
             eval "WILDCARD=\$$((ARGPOS))"
             let ARGPOS++
             eval "DIRECTORY=\$$((ARGPOS))"
             
-            #Setup searches
+            # Setup searches
             FINDFILES=$("$FIND" -name "$WILDCARD" -type f 2>/dev/null)
-            COPIEDFILES=$(wc -w <<< "$FINDFILES")
+            COPIEDFILES=$("$WC" -w <<< "$FINDFILES")
             
             # Check the wildcard to see if there are results
-            if [[ -z $($FIND -name "$WILDCARD" -type f) ]]; then
-                echo "There are no matches for: $WILDCARD"
-                exit
+            if [[ -z $("$FIND" -name "$WILDCARD" -type f) ]]; then
+                (>&2 echo "There are no matches for: $WILDCARD")
+                exit -1
             fi
 
             # Check if there are any arguments missing before progressing
-            if [[ -z $DIRECTORY  ]] || [[ -z $WILDCARD ]];  then
-                echo "There are missing arguments for switch -b"
-                exit
+            if [[ -z "$DIRECTORY"  ]] || [[ -z "$WILDCARD" ]];  then
+                (>&2 echo "There is a missing argument for switch -b")
+                exit -2
             fi
 
-            
             # Check if there are results for the directory and make sure its a directory.
             if [[ -n $("$FIND" -name "$DIRECTORY" 2>/dev/null) ]] && [[ -d "$DIRECTORY" ]]; then
-                #echo "Directory exists you are free to copy the files"
-                "$FIND" -name "$WILDCARD" -type f -exec cp --parents -t "$DIRECTORY" {} \; 2>/dev/null
+                "$FIND" -name "$WILDCARD" -type f -exec "$CP" -t "$DIRECTORY" {} \; 2>/dev/null
             # If nothing exists (file or directory) create a directory
-            elif [[ ! -a $DIRECTORY  ]]; then
-                mkdir -p $DIRECTORY 2>/dev/null
-                "$FIND" -name "$WILDCARD" -type f -exec cp --parents -t "$DIRECTORY" {} \; 2>/dev/null
-                echo "$DIRECTORY has been created. $COPIEDFILES have been copied."
+            elif [[ ! -a "$DIRECTORY"  ]]; then
+                "$MKDIR" -p $DIRECTORY 2>/dev/null
+                "$FIND" -name "$WILDCARD" -type f -exec "$CP" -t "$DIRECTORY" {} \; 2>/dev/null
 
                 # Check if there is an error making the directory
                 if [[ $? -ne 0 ]]; then
-                    echo "You must supply a valid argument with the -b switch. Example: -b <wildcard> <directoryname>"
-                    exit
+                    (>&2 echo "You must supply a valid argument with the -b switch. Example: -b <wildcard> <directoryname>")
+                    exit -3
                 fi
             else
-                # There is a file with the same name.
-                echo "There is a file with the same name."
+                (>&2 echo "There is a file with the same name. Please choose a unique target directory.")
+                exit -4
             fi
 
-            # Shift requires because of second argument
+            # Shift is required because of second argument
             shift
         ;;
-        #If there is an unknown operator then throw an error
+        # If there is an unknown operator then throw an error
         \?)
-            echo "Unknown option: -$OPTARG"
+            (>&2 echo "Unknown option: -$OPTARG")
+            exit -5
         ;;
-        #The -b operator requires an argument
+        # The -b operator requires an argument
         :)
-            echo "Option -$OPTARG requires an argument."
+            (>&2 echo "Option -$OPTARG requires an argument.")
+            exit -6
         ;;
     esac
 
+    # Plus the count to keep track of the current itteration
     let COUNT++
 done
 exit 0
