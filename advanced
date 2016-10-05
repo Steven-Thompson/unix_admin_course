@@ -19,7 +19,7 @@ while getopts ":pob:" opt; do
         ;;
         o)
             # Maximum number of open files allowed per user
-            echo "$(ulimit -u)"    
+            ulimit -u
         ;;
         b)
             ARGPOS=$COUNT
@@ -29,10 +29,6 @@ while getopts ":pob:" opt; do
             eval "WILDCARD=\$$((ARGPOS))"
             let ARGPOS++
             eval "DIRECTORY=\$$((ARGPOS))"
-            
-            # Setup searches
-            FINDFILES=$("$FIND" -name "$WILDCARD" -type f 2>/dev/null)
-            COPIEDFILES=$("$WC" -w <<< "$FINDFILES")
             
             # Check the wildcard to see if there are results
             if [[ -z $("$FIND" -name "$WILDCARD" -type f) ]]; then
@@ -51,17 +47,11 @@ while getopts ":pob:" opt; do
                 "$FIND" -name "$WILDCARD" -type f -exec "$CP" -t "$DIRECTORY" {} \; 2>/dev/null
             # If nothing exists (file or directory) create a directory
             elif [[ ! -a "$DIRECTORY"  ]]; then
-                "$MKDIR" -p $DIRECTORY 2>/dev/null
+                "$MKDIR" -p "$DIRECTORY" 2>/dev/null
                 "$FIND" -name "$WILDCARD" -type f -exec "$CP" -t "$DIRECTORY" {} \; 2>/dev/null
-
-                # Check if there is an error making the directory
-                if [[ $? -ne 0 ]]; then
-                    (>&2 echo "You must supply a valid argument with the -b switch. Example: -b <wildcard> <directoryname>")
-                    exit -3
-                fi
             else
                 (>&2 echo "There is a file with the same name. Please choose a unique target directory.")
-                exit -4
+                exit -3
             fi
 
             # Shift is required because of second argument
@@ -70,12 +60,12 @@ while getopts ":pob:" opt; do
         # If there is an unknown operator then throw an error
         \?)
             (>&2 echo "Unknown option: -$OPTARG")
-            exit -5
+            exit -4
         ;;
         # The -b operator requires an argument
         :)
             (>&2 echo "Option -$OPTARG requires an argument.")
-            exit -6
+            exit -5
         ;;
     esac
 
