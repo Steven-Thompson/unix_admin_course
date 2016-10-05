@@ -2,7 +2,6 @@
 
 #Setup binaries
 FIND=/usr/bin/find
-WC=/usr/bin/wc
 GREP=/usr/bin/grep
 CP=/usr/bin/cp
 MKDIR=/usr/bin/mkdir
