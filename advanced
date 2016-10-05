@@ -48,11 +48,11 @@ while getopts ":pob:" opt; do
             # Check if there are results for the directory and make sure its a directory.
             if [[ -n $("$FIND" -name "$DIRECTORY" 2>/dev/null) ]] && [[ -d "$DIRECTORY" ]]; then
                 #echo "Directory exists you are free to copy the files"
-                "$FIND" -name "$WILDCARD" -type f -exec cp -t "$DIRECTORY" {} \; 2>/dev/null
+                "$FIND" -name "$WILDCARD" -type f -exec cp --parents -t "$DIRECTORY" {} \; 2>/dev/null
             # If nothing exists (file or directory) create a directory
             elif [[ ! -a $DIRECTORY  ]]; then
-                mkdir $DIRECTORY 2>/dev/null
-                "$FIND" -name "$WILDCARD" -type f -exec cp -t "$DIRECTORY" {} \; 2>/dev/null
+                mkdir -p $DIRECTORY 2>/dev/null
+                "$FIND" -name "$WILDCARD" -type f -exec cp --parents -t "$DIRECTORY" {} \; 2>/dev/null
                 echo "$DIRECTORY has been created. $COPIEDFILES have been copied."
 
                 # Check if there is an error making the directory

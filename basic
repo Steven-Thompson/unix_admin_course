@@ -6,7 +6,7 @@ QUOTA="/bin/quota"
 DISKFREE="/bin/df"
 GROUPNAME="/bin/groups"
 
-#Seletion
+# Store the argument for the script
 OPTION=$1
 
 #Check if there is an option entered
@@ -23,7 +23,7 @@ case "$OPTION" in
         $FREEMEMORY -mh
     ;;
     diskfree)
-        $DISKFREE -h 2>/dev/null | more
+        $DISKFREE -h 2>/dev/null | less
     ;;
     groups)
         $GROUPNAME "$LOGNAME"

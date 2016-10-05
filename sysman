@@ -7,13 +7,12 @@ QUIT=0
 SUBMENU=0
 
 function display_menu {
-    $CLEAR
     DISPLAYED_MENU=$1
     $DISPLAYED_MENU
 }
 
 function main_menu {
-    $PRINTF "####################################################\n"
+    $PRINTF "######################################################################################\n"
     $PRINTF "#\n"
     $PRINTF "# Welcome to the system manager\n"
     $PRINTF "# -----------------------------\n"
@@ -25,14 +24,13 @@ function main_menu {
     $PRINTF "# 3) passwd file options\n"
     $PRINTF "# 4) quit\n"
     $PRINTF "#\n"
-    #$PRINTF "\r\r\r############################"
     $PRINTF "# Please enter a choice: "
     read CHOICE
-    $PRINTF "####################################################\n"
+    $PRINTF "######################################################################################\n\n"
 }
 
 function basic_menu {
-    $PRINTF "####################################################\n"
+    $PRINTF "######################################################################################\n"
     $PRINTF "# Basic Tasks Menu\n"
     $PRINTF "# ----------------\n"
     $PRINTF "#\n"
@@ -44,9 +42,38 @@ function basic_menu {
     $PRINTF "# 6) Quit this menu\n#\n"
     $PRINTF "# Please enter an option: "
     read CHOICE
-    $PRINTF "####################################################\n\n"
+    $PRINTF "######################################################################################\n\n"
 }
 
+function advanced_menu {
+    $PRINTF "######################################################################################\n"
+    $PRINTF "# Advanced Tasks Menu\n"
+    $PRINTF "#\n"
+    $PRINTF "# 1) Print the number of CPUs available on the system\n"
+    $PRINTF "# 2) Print the meximum number of open files allowed per user\n"
+    $PRINTF "# 3) Backup all files that match a criterion\n"
+    $PRINTF "# 4) Quit this menu\n#\n"
+    $PRINTF "# Please enter your choice: "
+    read CHOICE
+    $PRINTF "######################################################################################\n\n"
+}
+
+function passwd_menu {
+    $PRINTF "######################################################################################\n"
+    $PRINTF "# Passwd Tasks Menu\n"
+    $PRINTF "#\n"
+    $PRINTF "# 1) Print the userid of a specified user\n"
+    $PRINTF "# 2) Print the groupid of a specified user\n"
+    $PRINTF "# 3) Print the comment field for a specified user\n"
+    $PRINTF "# 4) Print the home directory of a specified user\n"
+    $PRINTF "# 5) Print the default shell of a specified user\n"
+    $PRINTF "# 6) Exit this menu\n#\n"
+    $PRINTF "# Please enter your selection: "
+    read CHOICE
+    $PRINTF "######################################################################################\n\n"
+}
+
+$CLEAR
 
 
 while [[ $QUIT -eq "0" ]]; do
@@ -55,61 +82,91 @@ while [[ $QUIT -eq "0" ]]; do
     
     case $CHOICE in 
         1)
-
             while [[ $SUBMENU -eq "0" ]]; do
                 display_menu basic_menu
                 case $CHOICE in
                 1)
                     ./basic freemem
-                    SUBMENU=1
-                    QUIT=1
                     ;;
                 2)
                     ./basic diskfree
-                    SUBMENU=1
-                    QUIT=1
                     ;;
                 3)
                     ./basic quota
-                    SUBMENU=1
-                    QUIT=1
                     ;;
                 4)
                     ./basic groups
-                    SUBMENU=1
-                    QUIT=1
                     ;;
                 5)
                     ./basic 'history'
-                    SUBMENU=1
-                    QUIT=1
                     ;;
-
                 6)
                     SUBMENU=1
                 ;;
                 esac
-
-
             done
         ;;
         2)
-        
+
+            while [[ $SUBMENU -eq "0" ]]; do
+                display_menu advanced_menu
+
+                if [[ $CHOICE -eq "3" ]]; then
+                    $PRINTF "Please enter the criteria to search: "
+                    read CRITERIA
+                    $PRINTF "Enter the directory to store the backup: "
+                    read BACKUP
+                fi
+
+                case $CHOICE in
+                1)
+                    ./advanced -p
+                ;;
+                2)
+                    ./advanced -o
+                ;;
+                3)
+                    ./advanced -b "$CRITERIA" "$BACKUP"
+                ;;
+                4)
+                    SUBMENU=1
+                ;;
+                esac
+            done
+        ;;
+        3)
+            while [[ $SUBMENU -eq "0" ]]; do
+                display_menu passwd_menu
+                
+                if [[ $CHOICE -gt "0" ]] && [[ $CHOICE -lt "6" ]]; then
+                    $PRINTF "Enter the specified user: "
+                    read USER
+                fi
+
+                case $CHOICE in
+                1)
+                    ./userman userid $USER
+                ;;
+                2)
+                    ./userman groupid $USER
+                ;;
+                3)
+                    ./userman comment $USER
+                ;;
+                4)
+                    ./userman home $USER
+                ;;
+                5)
+                    ./userman shell $USER
+                ;;
+                6)
+                    SUBMENU=1
+                ;;
+                esac
+            done
         ;;
         4)
             QUIT=1
         ;;
-
-
-
-
     esac
-
-
-
-
-
     done
-
-
-#main_menu
