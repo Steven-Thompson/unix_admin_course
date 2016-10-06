@@ -1,16 +1,23 @@
 #!/bin/bash
 
+# Setup variables for binaries
 PRINTF="/usr/bin/printf"
 CLEAR="/usr/bin/clear"
 
+# Variables to control menu state
 QUIT=0
 SUBMENU=0
 
+# Error message for invalid selection
+ERROR_SELECTION="You have made an invalid selection.\n\n"
+
+# Called to display the different types of menu
 function display_menu {
     DISPLAYED_MENU=$1
     $DISPLAYED_MENU
 }
 
+# Main menu 
 function main_menu {
     $PRINTF "######################################################################################\n"
     $PRINTF "#\n"
@@ -29,8 +36,9 @@ function main_menu {
     $PRINTF "######################################################################################\n\n"
 }
 
+# Basic Menu
 function basic_menu {
-    $PRINTF "######################################################################################\n"
+    $PRINTF "\n######################################################################################\n"
     $PRINTF "# Basic Tasks Menu\n"
     $PRINTF "# ----------------\n"
     $PRINTF "#\n"
@@ -45,8 +53,9 @@ function basic_menu {
     $PRINTF "######################################################################################\n\n"
 }
 
+# Advanced Menu
 function advanced_menu {
-    $PRINTF "######################################################################################\n"
+    $PRINTF "\n######################################################################################\n"
     $PRINTF "# Advanced Tasks Menu\n"
     $PRINTF "#\n"
     $PRINTF "# 1) Print the number of CPUs available on the system\n"
@@ -58,8 +67,9 @@ function advanced_menu {
     $PRINTF "######################################################################################\n\n"
 }
 
+# Passwd Menu
 function passwd_menu {
-    $PRINTF "######################################################################################\n"
+    $PRINTF "\n######################################################################################\n"
     $PRINTF "# Passwd Tasks Menu\n"
     $PRINTF "#\n"
     $PRINTF "# 1) Print the userid of a specified user\n"
@@ -73,45 +83,47 @@ function passwd_menu {
     $PRINTF "######################################################################################\n\n"
 }
 
+# Clear the screen before starting the script
 $CLEAR
 
-
-while [[ $QUIT -eq "0" ]]; do
+while [[ "$QUIT" -eq "0" ]]; do
     display_menu main_menu
     SUBMENU=0
     
     case $CHOICE in 
         1)
-            while [[ $SUBMENU -eq "0" ]]; do
+            while [[ "$SUBMENU" -eq "0" ]]; do
                 display_menu basic_menu
                 case $CHOICE in
                 1)
                     ./basic freemem
-                    ;;
+                ;;
                 2)
                     ./basic diskfree
-                    ;;
+                ;;
                 3)
                     ./basic quota
-                    ;;
+                ;;
                 4)
                     ./basic groups
-                    ;;
+                ;;
                 5)
                     ./basic 'history'
-                    ;;
+                ;;
                 6)
                     SUBMENU=1
+                ;;
+                *) 
+                    "$PRINTF" "$ERROR_SELECTION"
                 ;;
                 esac
             done
         ;;
         2)
-
-            while [[ $SUBMENU -eq "0" ]]; do
+            while [[ "$SUBMENU" -eq "0" ]]; do
                 display_menu advanced_menu
 
-                if [[ $CHOICE -eq "3" ]]; then
+                if [[ "$CHOICE" -eq "3" ]]; then
                     $PRINTF "Please enter the criteria to search: "
                     read -r CRITERIA
                     $PRINTF "Enter the directory to store the backup: "
@@ -131,14 +143,17 @@ while [[ $QUIT -eq "0" ]]; do
                 4)
                     SUBMENU=1
                 ;;
+                *)
+                    "$PRINTF" "$ERROR_SELECTION"
+                ;;
                 esac
             done
         ;;
         3)
-            while [[ $SUBMENU -eq "0" ]]; do
+            while [[ "$SUBMENU" -eq "0" ]]; do
                 display_menu passwd_menu
                 
-                if [[ $CHOICE -gt "0" ]] && [[ $CHOICE -lt "6" ]]; then
+                if [[ "$CHOICE" -gt "0" ]] && [[ "$CHOICE" -lt "6" ]]; then
                     $PRINTF "Enter the specified user: "
                     read -r USER
                 fi
@@ -162,11 +177,18 @@ while [[ $QUIT -eq "0" ]]; do
                 6)
                     SUBMENU=1
                 ;;
+                *)
+                    "$PRINTF" "$ERROR_SELECTION"
+                ;;
                 esac
             done
         ;;
         4)
             QUIT=1
         ;;
+        *)
+            "$PRINTF" "$ERROR_SELECTION"
+        ;;
     esac
-    done
+done
+exit 0
