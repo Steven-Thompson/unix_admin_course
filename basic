@@ -1,6 +1,6 @@
 #!/bin/bash -i
 
-#Setup binaries
+# Setup binaries
 FREEMEMORY="/bin/free"
 QUOTA="/bin/quota"
 DISKFREE="/bin/df"
@@ -9,12 +9,12 @@ GROUPNAME="/bin/groups"
 # Store the argument for the script
 OPTION=$1
 
-#Check if there is an option entered
+# Check if there is an option entered
 if [[ -z "$OPTION" ]]; then
     exit -1
 fi
 
-#Check option value
+# Check option value
 case "$OPTION" in
     quota)
         $QUOTA -s

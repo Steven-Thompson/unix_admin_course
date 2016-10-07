@@ -1,0 +1,36 @@
+##########################################################################
+#                                                                        
+# Author: Steven Thompson                                                
+# Student #: s3387929                                                    
+#                                                                        
+# General Comments
+#   Stderr: All error messages are redirected to STDERR. I have included 
+#   this at the front of the code to make it more readable.
+#
+#   All programs are called at the beginning of the script excluding
+#   built in programs
+#
+#   All identified potenial error catchments exit with a non-zero exit
+#   code
+#
+# Advanced Program Comments
+#   Useage: ./advanced <switch> <arguments>
+#   Example: ./advanced -p -b \*.txt txtfilesarehere -o
+#
+# Userman Program Comments
+#   Useage: ./userman <argument> <argument>
+#   Example: ./userman home ftp
+#   Comments: Shellcheck reports a warning that not all variables are
+#   being used in the program. However this is because the variables
+#   are called on execution when the arguments are passed through.
+#   I believe this is an efficent function to perform the required task
+#
+# Sysman Program Comments
+#   Useage: ./sysman
+#   Example: ./sysman
+#   Comments: For the advanced and userman section of the menu system
+#   I have added additional reads to collect the argument to be passed
+#   to the script. All errors in this script are handles by the script
+#   being called.
+#
+##########################################################################

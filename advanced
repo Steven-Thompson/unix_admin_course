@@ -14,11 +14,11 @@ while getopts ":pob:" opt; do
         p)
             # Find processor from cpuinfo and count how many there are
             PROCESSORS=$("$GREP" processor /proc/cpuinfo -c)
-            echo "$PROCESSORS"
+            echo "Number of processors available: $PROCESSORS"
         ;;
         o)
             # Maximum number of open files allowed per user
-            ulimit -u
+            echo "Maximum nuber of files open per user: $(ulimit -u)"
         ;;
         b)
             ARGPOS=$COUNT
